@@ -173,11 +173,27 @@ export const DATA = [
 
 export const WEATHER_MAPPING = {
   "Fair Skies": "Fair_Skies.png",
-  "Clear Skies": "Clear_Skies.png"
+  "Clear Skies": "Clear_Skies.png",
+  "Blizzard": "Blizzard.png",
+  "Clouds": "Clouds.png",
+  "Gales": "Gales.png",
+  "Heat Waves": "Heat_Waves.png",
+  "Showers": "Showers.png",
+  "Thunderstorms": "Thunderstorms.png",
+  "Dust Storms": "Dust_Storms.png",
+  "Gloom": "Gloom.png",
+  "Rain": "Rain.png",
+  "Thunder": "Thunder.png"
 };
 
 export const EMOTE_MAPPING = {
-  "Lookout": "Lookout.png"
+  "Lookout": "Lookout.png",
+  "Comfort": "Comfort.png",
+  "Point": "Point.png",
+  "Pray": "Pray.png",
+  "Psych": "Psych.png",
+  "Salute": "Salute.png",
+  "Sit": "Sit.png"
 };
 
 export const PHASES = [
