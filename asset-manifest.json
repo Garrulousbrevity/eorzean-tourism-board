@@ -1,14 +1,15 @@
 {
   "files": {
-    "main.css": "/eorzean-tourism-board/static/css/main.31d6cfe0.css",
-    "main.js": "/eorzean-tourism-board/static/js/main.1ba27b45.js",
+    "main.css": "/eorzean-tourism-board/static/css/main.bcc99198.css",
+    "main.js": "/eorzean-tourism-board/static/js/main.1f5cafdd.js",
     "static/js/787.34fc0924.chunk.js": "/eorzean-tourism-board/static/js/787.34fc0924.chunk.js",
     "index.html": "/eorzean-tourism-board/index.html",
-    "main.1ba27b45.js.map": "/eorzean-tourism-board/static/js/main.1ba27b45.js.map",
+    "main.bcc99198.css.map": "/eorzean-tourism-board/static/css/main.bcc99198.css.map",
+    "main.1f5cafdd.js.map": "/eorzean-tourism-board/static/js/main.1f5cafdd.js.map",
     "787.34fc0924.chunk.js.map": "/eorzean-tourism-board/static/js/787.34fc0924.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.31d6cfe0.css",
-    "static/js/main.1ba27b45.js"
+    "static/css/main.bcc99198.css",
+    "static/js/main.1f5cafdd.js"
   ]
 }
