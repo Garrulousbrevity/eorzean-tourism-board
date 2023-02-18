@@ -44,7 +44,7 @@ function App() {
       <Container component="main">
         <Grid container spacing={2}>
           <Grid xs={12}>
-            <img className="headerImage" src="eorzean-tourism-board/greetings-from-eorzea.png" alt="Greetings from Eorzea header" />
+            <img className="headerImage" src={`${process.env.PUBLIC_URL}/greetings-from-eorzea.png`} alt="Greetings from Eorzea header" />
           </Grid>
           {logs.map((log) => (
           <Grid xs={4} key={log.Key}>
