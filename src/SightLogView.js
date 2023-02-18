@@ -31,7 +31,7 @@ function SightLogView({
         <Grid container spacing={1}>
           <Grid xs={4}>
             <Chip
-              avatar={<Avatar alt={Emote} src={`emotes/${EMOTE_MAPPING[Emote]}`} />}
+              avatar={<Avatar alt={Emote} src={`eorzean-tourism-board/emotes/${EMOTE_MAPPING[Emote]}`} />}
               label={Emote}                       
             />
           </Grid>
@@ -44,7 +44,7 @@ function SightLogView({
             {Weather.map(condition => (
               <Grid xs={12}>
                 <Chip size="small"
-                  avatar={<Avatar alt={condition} src={`weather/${WEATHER_MAPPING[condition]}`} />}
+                  avatar={<Avatar alt={condition} src={`eorzean-tourism-board/weather/${WEATHER_MAPPING[condition]}`} />}
                   label={condition}
                 />
               </Grid>
