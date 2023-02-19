@@ -45,17 +45,16 @@ function SightLog({
     });
     if (goodWeatherTime != null) {
       const phase = phases.find(phase => phase.StartTime === new EorzeaTime(new Date(goodWeatherTime)).getHours());
-      const startOffset = Math.max(log.Window.StartTime, phase.StartTime) - phase.StartTime;
-      setStartTime(new Date(goodWeatherTime + (ONE_HOUR * startOffset)));
-      let endOffset = log.Window.EndTime - (log.Window.StartTime + startOffset);
-      if ((log.Window.StartTime > log.Window.EndTime || log.Window.EndTime > phase.EndTime) && log.Weather.some(weather => weather === eWeather.getWeather(new Date(goodWeatherTime + EIGHT_HOURS)))) {
-        if (log.Window.StartTime > log.Window.EndTime) {
-          endOffset += log.Window.StartTime;
-        } else {
-          endOffset += log.Window.EndTime - phase.EndTime;
-        }
+      const effectiveWindowStartTime = Math.max(log.Window.StartTime, phase.StartTime);
+      const baseOffset = (effectiveWindowStartTime - phase.StartTime)
+      setStartTime(new Date(goodWeatherTime + (ONE_HOUR * baseOffset)));
+      const nextWindowIsAlsoGoodWeather = log.Weather.some(weather => weather === eWeather.getWeather(new Date(goodWeatherTime + EIGHT_HOURS)));
+      let effectiveWindowEndTime = log.Window.EndTime > log.Window.StartTime ? log.Window.EndTime : log.Window.EndTime + 24
+
+      if (effectiveWindowEndTime >= phase.EndTime && !nextWindowIsAlsoGoodWeather) {
+        effectiveWindowEndTime = phase.EndTime;
       }
-      setEndTime(new Date(goodWeatherTime + (endOffset * ONE_HOUR)));
+      setEndTime(new Date(goodWeatherTime + ((baseOffset + effectiveWindowEndTime - effectiveWindowStartTime) * ONE_HOUR)));
     }
   }, [log.Weather, log.Window, log.ZoneId, times])
 
