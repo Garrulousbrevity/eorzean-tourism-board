@@ -6,10 +6,10 @@ import SightLogView from './SightLogView';
 
 const Times_Intersect = (Range1, Range2) => {
   if (Range1.StartTime > Range1.EndTime) {
-    return Times_Intersect(Range2, {StartTime: Range1.EndTime, EndTime: 24}) || Times_Intersect(Range2, {StartTime: 0, EndTime: Range1.StartTime});
+    return Times_Intersect(Range2, {StartTime: Range1.StartTime, EndTime: 24}) || Times_Intersect(Range2, {StartTime: 0, EndTime: Range1.EndTime});
   }
   if (Range2.StartTime > Range2.EndTime) {
-    return Times_Intersect(Range1, {StartTime: Range2.EndTime, EndTime: 24}) || Times_Intersect(Range1, {StartTime: 0, EndTime: Range2.StartTime});
+    return Times_Intersect(Range1, {StartTime: Range2.StartTime, EndTime: 24}) || Times_Intersect(Range1, {StartTime: 0, EndTime: Range2.EndTime});
   }
   return Range1.StartTime < Range2.EndTime && Range1.EndTime > Range2.StartTime;
 };
@@ -24,18 +24,19 @@ const getTimeDisplay = time => {
 function SightLog({
   log,
   times,
-  onRefresh
 }) {
   const [startTime, setStartTime] = useState(null);
   const [endTime, setEndTime] = useState(null);
   const [windowStartDisplay, setWindowStartDisplay] = useState('');
   const [windowEndDisplay, setWindowEndDisplay] = useState('');
+  const [alert, setAlert] = useState(null);
 
   useEffect(() => {
     setStartTime(null);
     setEndTime(null);
     const eWeather = new EorzeaWeather(log.ZoneId);
     const phases = PHASES.filter(phase => Times_Intersect(phase, log.Window));
+    // if (log.Key === 64) debugger;
     const goodWeatherTime = times.find(time => {
       if (new Date(time + EIGHT_HOURS) < new Date()) return false;
       const date = new Date(time);
@@ -45,7 +46,7 @@ function SightLog({
     });
     if (goodWeatherTime != null) {
       const phase = phases.find(phase => phase.StartTime === new EorzeaTime(new Date(goodWeatherTime)).getHours());
-      const effectiveWindowStartTime = Math.max(log.Window.StartTime, phase.StartTime);
+      const effectiveWindowStartTime = Math.max(phase.EndTime < log.Window.StartTime ? phase.StartTime : log.Window.StartTime, phase.StartTime);
       const baseOffset = (effectiveWindowStartTime - phase.StartTime)
       setStartTime(new Date(goodWeatherTime + (ONE_HOUR * baseOffset)));
       const nextWindowIsAlsoGoodWeather = log.Weather.some(weather => weather === eWeather.getWeather(new Date(goodWeatherTime + EIGHT_HOURS)));
@@ -62,6 +63,10 @@ function SightLog({
     setWindowEndDisplay(getTimeDisplay(log.Window.EndTime));
   }, [log.Window.StartTime, log.Window.EndTime]);
 
+  useEffect(() => {
+    setAlert(startTime != null && endTime != null && startTime >= endTime ? "This is an impossible time range" : null);
+  }, [startTime, endTime]);
+
   return (
     <SightLogView 
       {...log}
@@ -69,6 +74,7 @@ function SightLog({
       CollectableWindowEndTime={endTime}
       WindowStartDisplay={windowStartDisplay}
       WindowEndDisplay={windowEndDisplay}
+      AlertMessage={alert}
     />
   );
 };
