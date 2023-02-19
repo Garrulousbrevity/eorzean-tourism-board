@@ -1,4 +1,4 @@
-import { DAYS_TO_CHECK, WEATHER_MAPPING, EMOTE_MAPPING } from "./Constants";
+import { WEATHER_MAPPING, EMOTE_MAPPING } from "./Constants";
 import { Avatar, Card, CardContent, CardHeader, Chip, Link, Typography } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
 
