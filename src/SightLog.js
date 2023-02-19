@@ -11,7 +11,7 @@ const Times_Intersect = (Range1, Range2) => {
   if (Range2.StartTime > Range2.EndTime) {
     return Times_Intersect(Range1, {StartTime: Range2.EndTime, EndTime: 24}) || Times_Intersect(Range1, {StartTime: 0, EndTime: Range2.StartTime});
   }
-  return Range1.StartTime <= Range2.EndTime && Range1.EndTime >= Range2.StartTime;
+  return Range1.StartTime < Range2.EndTime && Range1.EndTime > Range2.StartTime;
 };
 
 const getTimeDisplay = time => {
@@ -50,7 +50,6 @@ function SightLog({
       setStartTime(new Date(goodWeatherTime + (ONE_HOUR * baseOffset)));
       const nextWindowIsAlsoGoodWeather = log.Weather.some(weather => weather === eWeather.getWeather(new Date(goodWeatherTime + EIGHT_HOURS)));
       let effectiveWindowEndTime = log.Window.EndTime > log.Window.StartTime ? log.Window.EndTime : log.Window.EndTime + 24
-
       if (effectiveWindowEndTime >= phase.EndTime && !nextWindowIsAlsoGoodWeather) {
         effectiveWindowEndTime = phase.EndTime;
       }
