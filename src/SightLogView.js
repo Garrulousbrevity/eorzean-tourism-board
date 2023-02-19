@@ -1,5 +1,5 @@
 import { WEATHER_MAPPING, EMOTE_MAPPING } from "./Constants";
-import { Avatar, Card, CardContent, CardHeader, Chip, Link, Typography } from "@mui/material";
+import { Alert, Avatar, Card, CardContent, CardHeader, Chip, Link, Typography } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
 
 function SightLogView({
@@ -8,14 +8,14 @@ function SightLogView({
   ZoneName,
   Coordinates,
   Weather,
-  Window,
   Emote,
   Comment,
   URL,
   CollectableWindowStartTime,
   CollectableWindowEndTime,
   WindowStartDisplay,
-  WindowEndDisplay
+  WindowEndDisplay,
+  AlertMessage
 }) {
   return (
     <Card>
@@ -29,6 +29,11 @@ function SightLogView({
       />
       <CardContent>
         <Grid container spacing={1}>
+          {AlertMessage != null && (
+            <Grid xs={12}>
+              <Alert severity="error">{AlertMessage}</Alert>
+            </Grid>
+          )}
           <Grid xs={4}>
             <Chip
               avatar={<Avatar alt={Emote} src={`${process.env.PUBLIC_URL}/emotes/${EMOTE_MAPPING[Emote]}`} />}
@@ -42,7 +47,7 @@ function SightLogView({
           </Grid>
           <Grid xs={4} container>
             {Weather.map(condition => (
-              <Grid xs={12}>
+              <Grid xs={12} key={condition}>
                 <Chip size="small"
                   avatar={<Avatar alt={condition} src={`${process.env.PUBLIC_URL}/weather/${WEATHER_MAPPING[condition]}`} />}
                   label={condition}
