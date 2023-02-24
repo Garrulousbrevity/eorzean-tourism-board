@@ -55,6 +55,11 @@ export const EIGHT_HOURS = ONE_HOUR * 8;
 export const ONE_DAY = EIGHT_HOURS * 3;
 export const DAYS_TO_CHECK = 10;
 
+export const LOCAL_STORAGE_KEY_SORT_COLUMN = "LocalStorage";
+export const LOCAL_STORAGE_KEY_SEARCH_TERM = "SearchTerm";
+export const LOCAL_STORAGE_ALREADY_FOUND_LIST = "FoundList";
+export const LOCAL_STORAGE_THEME = "Theme";
+
 export const DATA = [
   {
     "Key": 1,

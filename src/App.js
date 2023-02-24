@@ -1,6 +1,6 @@
 import './App.css';
 import { useState, useEffect, useMemo } from 'react';
-import {DATA, ONE_HOUR, EIGHT_HOURS, ONE_DAY, DAYS_TO_CHECK, SORT_COLUMN_KEY, SORT_COLUMN_START, SORT_COLUMN_END} from './Constants';
+import {DATA, ONE_HOUR, EIGHT_HOURS, ONE_DAY, DAYS_TO_CHECK, SORT_COLUMN_KEY, SORT_COLUMN_START, SORT_COLUMN_END, LOCAL_STORAGE_KEY_SORT_COLUMN, LOCAL_STORAGE_KEY_SEARCH_TERM, LOCAL_STORAGE_THEME} from './Constants';
 import range from 'lodash/range'
 import SightLog from './SightLog';
 import { Container } from '@mui/system';
@@ -9,16 +9,19 @@ import CssBaseline from '@mui/material/CssBaseline';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Grid from '@mui/material/Unstable_Grid2';
 import Menu from './Menu';
-
+import { Box, IconButton } from '@mui/material';
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
 
 function App() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const [storedTheme, setStoredTheme] = useState(localStorage.getItem(LOCAL_STORAGE_THEME)); 
   const [times, setTimes] = useState([]);
   const [lastRefresh, setLastRefresh] = useState(new Date());
   const [logs, setLogs] = useState(DATA);
   const [sortedLogs, setSortedLogs] = useState(logs);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortColumn, setSortColumn] = useState(SORT_COLUMN_END);
+  const [searchTerm, setSearchTerm] = useState(localStorage.getItem(LOCAL_STORAGE_KEY_SEARCH_TERM) ?? '');
+  const [sortColumn, setSortColumn] = useState(localStorage.getItem(LOCAL_STORAGE_KEY_SORT_COLUMN) ?? SORT_COLUMN_KEY);
 
   const updateCollectionWindow = ({Key, CollectableWindowStartTime, CollectableWindowEndTime, LastUpdated}) => {
     setLogs(prevLogs => (
@@ -33,14 +36,30 @@ function App() {
     ));
   }
 
+  const handleChangeSearchTerm = (searchTerm) => {
+    localStorage.setItem(LOCAL_STORAGE_KEY_SEARCH_TERM, searchTerm);
+    setSearchTerm(searchTerm);
+  }
+
+  const handleChangeSortColumn = (sortColumn) => {
+    localStorage.setItem(LOCAL_STORAGE_KEY_SORT_COLUMN, sortColumn);
+    setSortColumn(sortColumn);
+  };
+
+  const handleChangeTheme = () => {
+    const newTheme = theme.palette.mode === "dark" ? "light": "dark";
+    localStorage.setItem(LOCAL_STORAGE_THEME, newTheme);
+    setStoredTheme(newTheme);
+  };
+
   const theme = useMemo(
     () =>
       createTheme({
         palette: {
-          mode: prefersDarkMode ? 'dark' : 'light',
+          mode: storedTheme ?? (prefersDarkMode ? 'dark' : 'light'),
         },
       }),
-    [prefersDarkMode],
+    [prefersDarkMode, storedTheme],
   );
 
   useEffect(() => {
@@ -102,11 +121,25 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      <Box
+      sx={{
+        display: 'flex',
+        width: '100%',
+        alignItems: 'right',
+        justifyContent: 'right',
+        bgcolor: 'background.default',
+        color: 'text.primary',
+      }}
+    >
+      <IconButton sx={{ ml: 1 }} onClick={handleChangeTheme} color="inherit">
+        {theme.palette.mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
+      </IconButton>
+    </Box>
       <Menu
         searchTerm={searchTerm}
-        onChangeSearchTerm={setSearchTerm}
+        onChangeSearchTerm={handleChangeSearchTerm}
         sortColumn={sortColumn}
-        onChangeSortColumn={setSortColumn}
+        onChangeSortColumn={handleChangeSortColumn}
       />
       <Container component="main">
         <Grid container spacing={2}>
