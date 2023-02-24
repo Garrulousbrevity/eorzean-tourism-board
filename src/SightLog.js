@@ -24,39 +24,51 @@ const getTimeDisplay = time => {
 function SightLog({
   log,
   times,
+  updateCollectionWindow
 }) {
-  const [startTime, setStartTime] = useState(null);
-  const [endTime, setEndTime] = useState(null);
   const [windowStartDisplay, setWindowStartDisplay] = useState('');
   const [windowEndDisplay, setWindowEndDisplay] = useState('');
   const [alert, setAlert] = useState(null);
 
   useEffect(() => {
-    setStartTime(null);
-    setEndTime(null);
+    if ((log.CollectableWindowStartTime != null && log.CollectableWindowEndTime != null && log.CollectableWindowEndTime > new Date()) || times.length === 0) return;
+    if (log.LastUpdated < Date.now() + EIGHT_HOURS) return;
     const eWeather = new EorzeaWeather(log.ZoneId);
     const phases = PHASES.filter(phase => Times_Intersect(phase, log.Window));
-    // if (log.Key === 64) debugger;
     const goodWeatherTime = times.find(time => {
       if (new Date(time + EIGHT_HOURS) < new Date()) return false;
       const date = new Date(time);
       if (!phases.some(phase => phase.StartTime === new EorzeaTime(date).getHours())) return false;
       const actualWeather = eWeather.getWeather(date)
-      return log.Weather.some(allowedWeather => allowedWeather === actualWeather)
+      return log.Weather.some(allowedWeather => allowedWeather === actualWeather);
     });
     if (goodWeatherTime != null) {
       const phase = phases.find(phase => phase.StartTime === new EorzeaTime(new Date(goodWeatherTime)).getHours());
       const effectiveWindowStartTime = Math.max(phase.EndTime < log.Window.StartTime ? phase.StartTime : log.Window.StartTime, phase.StartTime);
       const baseOffset = (effectiveWindowStartTime - phase.StartTime)
-      setStartTime(new Date(goodWeatherTime + (ONE_HOUR * baseOffset)));
+      const CollectableWindowStartTime = new Date(goodWeatherTime + (ONE_HOUR * baseOffset));
       const nextWindowIsAlsoGoodWeather = log.Weather.some(weather => weather === eWeather.getWeather(new Date(goodWeatherTime + EIGHT_HOURS)));
       let effectiveWindowEndTime = log.Window.EndTime > log.Window.StartTime ? log.Window.EndTime : log.Window.EndTime + 24
       if (effectiveWindowEndTime >= phase.EndTime && !nextWindowIsAlsoGoodWeather) {
         effectiveWindowEndTime = phase.EndTime;
       }
-      setEndTime(new Date(goodWeatherTime + ((baseOffset + effectiveWindowEndTime - effectiveWindowStartTime) * ONE_HOUR)));
+      const CollectableWindowEndTime = new Date(goodWeatherTime + ((baseOffset + effectiveWindowEndTime - effectiveWindowStartTime) * ONE_HOUR));
+      updateCollectionWindow({Key: log.Key, CollectableWindowStartTime, CollectableWindowEndTime, LastUpdated: new Date()})
+    } else {
+      updateCollectionWindow({Key: log.Key, LastUpdated: new Date()});
     }
-  }, [log.Weather, log.Window, log.ZoneId, times])
+  }, [
+    log.Key,
+    log.Weather,
+    log.Window,
+    log.ZoneId,
+    log.CollectableWindowStartTime,
+    log.CollectableWindowEndTime,
+    log.LastUpdated,
+    times,
+    updateCollectionWindow
+  ]);
+
 
   useEffect(() => {
     setWindowStartDisplay(getTimeDisplay(log.Window.StartTime));
@@ -64,14 +76,12 @@ function SightLog({
   }, [log.Window.StartTime, log.Window.EndTime]);
 
   useEffect(() => {
-    setAlert(startTime != null && endTime != null && startTime >= endTime ? "This is an impossible time range" : null);
-  }, [startTime, endTime]);
+    setAlert(log.CollectableWindowStartTime != null && log.CollectableWindowEndTime != null && log.CollectableWindowStartTime >= log.CollectableWindowEndTime ? "This is an impossible time range" : null);
+  }, [log.CollectableWindowStartTime, log.CollectableWindowEndTime]);
 
   return (
     <SightLogView 
       {...log}
-      CollectableWindowStartTime={startTime}
-      CollectableWindowEndTime={endTime}
       WindowStartDisplay={windowStartDisplay}
       WindowEndDisplay={windowEndDisplay}
       AlertMessage={alert}

@@ -1,6 +1,6 @@
 import './App.css';
 import { useState, useEffect, useMemo } from 'react';
-import {DATA, ONE_HOUR, EIGHT_HOURS, ONE_DAY, DAYS_TO_CHECK} from './Constants';
+import {DATA, ONE_HOUR, EIGHT_HOURS, ONE_DAY, DAYS_TO_CHECK, SORT_COLUMN_KEY, SORT_COLUMN_START, SORT_COLUMN_END} from './Constants';
 import range from 'lodash/range'
 import SightLog from './SightLog';
 import { Container } from '@mui/system';
@@ -8,6 +8,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Grid from '@mui/material/Unstable_Grid2';
+import Menu from './Menu';
 
 
 function App() {
@@ -15,6 +16,22 @@ function App() {
   const [times, setTimes] = useState([]);
   const [lastRefresh, setLastRefresh] = useState(new Date());
   const [logs, setLogs] = useState(DATA);
+  const [sortedLogs, setSortedLogs] = useState(logs);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortColumn, setSortColumn] = useState(SORT_COLUMN_END);
+
+  const updateCollectionWindow = ({Key, CollectableWindowStartTime, CollectableWindowEndTime, LastUpdated}) => {
+    setLogs(prevLogs => (
+      prevLogs.map(log => {
+        return log.Key !== Key ? log : {
+          ...log,
+          CollectableWindowStartTime,
+          CollectableWindowEndTime,
+          LastUpdated
+        };
+      })
+    ));
+  }
 
   const theme = useMemo(
     () =>
@@ -25,6 +42,13 @@ function App() {
       }),
     [prefersDarkMode],
   );
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLastRefresh(new Date());
+    }, ONE_DAY);
+    return () => clearInterval(interval);
+  })
 
   useEffect(() => {
     const msec = new Date().getTime();
@@ -38,20 +62,63 @@ function App() {
   }, [
     lastRefresh
   ]);
+
+  useEffect(() => {
+    if (searchTerm == null) {
+      setLogs(DATA);
+    } else {
+      setLogs(DATA.filter(({Key, Name}) => (
+        `${Key}. ${Name}`.toLowerCase().includes(searchTerm.toLocaleLowerCase())
+      )));
+    }
+  }, [searchTerm]);
+
+  useEffect(() => {
+    switch(sortColumn) {
+      case SORT_COLUMN_KEY:
+        setSortedLogs([...logs].sort((a, b) => a.Key > b.Key ? 1 : -1));
+        break;
+      case SORT_COLUMN_START:
+        setSortedLogs([...logs].sort((a, b) => {
+          if (a.CollectableWindowStartTime === b.CollectableWindowStartTime) return 0;
+          if (a.CollectableWindowStartTime == null) return 1;
+          if (b.CollectableWindowStartTime == null) return -1;
+          return a.CollectableWindowStartTime < b.CollectableWindowStartTime ? -1 : 1;
+        }));
+        break;
+      case SORT_COLUMN_END:
+        setSortedLogs([...logs].sort((a, b) => {
+          if (a.CollectableWindowEndTime === b.CollectableWindowEndTime) return 0;
+          if (a.CollectableWindowEndTime == null) return 1;
+          if (b.CollectableWindowEndTime == null) return -1;
+          return a.CollectableWindowEndTime < b.CollectableWindowEndTime ? -1 : 1;
+        }));
+        break;
+      default:
+        break;
+    }
+  }, [sortColumn, logs]);
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      <Menu
+        searchTerm={searchTerm}
+        onChangeSearchTerm={setSearchTerm}
+        sortColumn={sortColumn}
+        onChangeSortColumn={setSortColumn}
+      />
       <Container component="main">
         <Grid container spacing={2}>
           <Grid xs={12}>
             <img className="headerImage" src={`${process.env.PUBLIC_URL}/greetings-from-eorzea.png`} alt="Greetings from Eorzea header" />
           </Grid>
-          {logs.map((log) => (
+          {sortedLogs.map((log) => (
           <Grid xs={4} key={log.Key}>
             <SightLog
               log={log}
               times={times}
-              onRefresh={() => setLastRefresh(new Date())}
+              updateCollectionWindow={updateCollectionWindow}
             />
           </Grid>
         ))}

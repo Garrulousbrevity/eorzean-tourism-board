@@ -41,6 +41,15 @@ export const PHASES = [
   }
 ];
 
+export const SORT_COLUMN_KEY = "Key";
+export const SORT_COLUMN_START = "Start Time";
+export const SORT_COLUMN_END = "End Time";
+export const SORT_COLUMNS = [
+  SORT_COLUMN_KEY,
+  SORT_COLUMN_START,
+  SORT_COLUMN_END
+];
+
 export const ONE_HOUR = 175 * 1000;
 export const EIGHT_HOURS = ONE_HOUR * 8;
 export const ONE_DAY = EIGHT_HOURS * 3;
@@ -1045,7 +1054,7 @@ export const DATA = [
     "ZoneId": EorzeaWeather.ZONE_NORTH_SHROUD,
     "ZoneName": "North Shroud",
     "Coordinates": {
-      "X": 18.8,
+      "X": 15.8,
       "Y": 32.0
     },
     "Weather": [
