@@ -48,7 +48,11 @@ function App() {
 
   const handleChangeTheme = () => {
     const newTheme = theme.palette.mode === "dark" ? "light": "dark";
-    localStorage.setItem(LOCAL_STORAGE_THEME, newTheme);
+    if (prefersDarkMode ? 'dark' : 'light' === newTheme) {
+      localStorage.removeItem(LOCAL_STORAGE_THEME);
+    } else {
+      localStorage.setItem(LOCAL_STORAGE_THEME, newTheme);
+    }
     setStoredTheme(newTheme);
   };
 
