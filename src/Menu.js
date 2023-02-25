@@ -1,4 +1,4 @@
-import { Divider, Drawer, Toolbar, TextField, MenuItem} from "@mui/material";
+import { Divider, Drawer, Toolbar, TextField, MenuItem, FormControlLabel, Checkbox} from "@mui/material";
 import { SORT_COLUMNS } from "./Constants";
 
 function Menu({
@@ -6,6 +6,10 @@ function Menu({
   onChangeSearchTerm,
   sortColumn,
   onChangeSortColumn,
+  filterFound,
+  onChangeFilterFound,
+  filterSecondBatch,
+  onChangeFilterSecondBatch
 }) {
     return (
     <Drawer
@@ -33,6 +37,25 @@ function Menu({
           </MenuItem>
         ))}
       </TextField>
+
+      <FormControlLabel
+        label="Hide Collected"
+        control={
+          <Checkbox 
+            checked={filterFound}
+            onChange={({target: {checked}}) => onChangeFilterFound(checked)}
+          />
+        }
+      />
+      <FormControlLabel
+        label="Hide Second Batch"
+        control={
+          <Checkbox 
+            checked={filterSecondBatch}
+            onChange={({target: {checked}}) => onChangeFilterSecondBatch(checked)}
+          />
+        }
+      />
     </Drawer>
   );
 };
