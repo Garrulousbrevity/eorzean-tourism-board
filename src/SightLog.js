@@ -24,7 +24,8 @@ const getTimeDisplay = time => {
 function SightLog({
   log,
   times,
-  updateCollectionWindow
+  updateCollectionWindow,
+  onChangeMarkAsFound
 }) {
   const [windowStartDisplay, setWindowStartDisplay] = useState('');
   const [windowEndDisplay, setWindowEndDisplay] = useState('');
@@ -69,7 +70,6 @@ function SightLog({
     updateCollectionWindow
   ]);
 
-
   useEffect(() => {
     setWindowStartDisplay(getTimeDisplay(log.Window.StartTime));
     setWindowEndDisplay(getTimeDisplay(log.Window.EndTime));
@@ -85,6 +85,7 @@ function SightLog({
       WindowStartDisplay={windowStartDisplay}
       WindowEndDisplay={windowEndDisplay}
       AlertMessage={alert}
+      onChangeMarkAsFound={onChangeMarkAsFound}
     />
   );
 };

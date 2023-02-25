@@ -1,6 +1,6 @@
 import './App.css';
 import { useState, useEffect, useMemo } from 'react';
-import {DATA, ONE_HOUR, EIGHT_HOURS, ONE_DAY, DAYS_TO_CHECK, SORT_COLUMN_KEY, SORT_COLUMN_START, SORT_COLUMN_END, LOCAL_STORAGE_KEY_SORT_COLUMN, LOCAL_STORAGE_KEY_SEARCH_TERM, LOCAL_STORAGE_THEME} from './Constants';
+import {DATA, ONE_HOUR, EIGHT_HOURS, ONE_DAY, DAYS_TO_CHECK, SORT_COLUMN_KEY, SORT_COLUMN_START, SORT_COLUMN_END, LOCAL_STORAGE_KEY_SORT_COLUMN, LOCAL_STORAGE_KEY_SEARCH_TERM, LOCAL_STORAGE_THEME, LOCAL_STORAGE_ALREADY_FOUND_LIST, LOCAL_STORAGE_FILTER_FOUND, LOCAL_STORAGE_HIDE_SECOND_BATCH} from './Constants';
 import range from 'lodash/range'
 import SightLog from './SightLog';
 import { Container } from '@mui/system';
@@ -18,24 +18,49 @@ function App() {
   const [storedTheme, setStoredTheme] = useState(localStorage.getItem(LOCAL_STORAGE_THEME)); 
   const [times, setTimes] = useState([]);
   const [lastRefresh, setLastRefresh] = useState(new Date());
-  const [logs, setLogs] = useState(DATA);
-  const [sortedLogs, setSortedLogs] = useState(logs);
+  const [logs, setLogs] = useState(Object.values(DATA).reduce((acc, data) => (
+    {
+      ...acc,
+      [data.Key]: {
+        ...data,
+        IsFound: localStorage.getItem(`${LOCAL_STORAGE_ALREADY_FOUND_LIST}-${data.Key}`) === "true"
+      }
+    }
+  ), {}));
+  const [filteredLogs, setFilteredLogs] = useState([]);
+  const [sortedLogs, setSortedLogs] = useState([]);
   const [searchTerm, setSearchTerm] = useState(localStorage.getItem(LOCAL_STORAGE_KEY_SEARCH_TERM) ?? '');
   const [sortColumn, setSortColumn] = useState(localStorage.getItem(LOCAL_STORAGE_KEY_SORT_COLUMN) ?? SORT_COLUMN_KEY);
+  const [filterFound, setFilterFound] = useState(localStorage.getItem(LOCAL_STORAGE_FILTER_FOUND) === "true");
+  const [hideSecondBatch, setHideSecondBatch] = useState(localStorage.getItem(LOCAL_STORAGE_HIDE_SECOND_BATCH) === "true");
 
   const updateCollectionWindow = ({Key, CollectableWindowStartTime, CollectableWindowEndTime, LastUpdated}) => {
     setLogs(prevLogs => (
-      prevLogs.map(log => {
-        return log.Key !== Key ? log : {
-          ...log,
+      {
+        ...prevLogs,
+        [Key]: {
+          ...prevLogs[Key],
           CollectableWindowStartTime,
           CollectableWindowEndTime,
           LastUpdated
-        };
-      })
-    ));
-  }
+        }
+      }
+  ))};
 
+  const handleChangeMarkAsFound = (({Key, IsFound}) => {
+    setLogs(prevLogs => (
+      {
+        ...prevLogs,
+        [Key]: {
+          ...prevLogs[Key],
+          IsFound
+        }
+      }
+    ));
+    localStorage.setItem(`${LOCAL_STORAGE_ALREADY_FOUND_LIST}-${Key}`, IsFound);
+  });
+
+  
   const handleChangeSearchTerm = (searchTerm) => {
     localStorage.setItem(LOCAL_STORAGE_KEY_SEARCH_TERM, searchTerm);
     setSearchTerm(searchTerm);
@@ -47,6 +72,7 @@ function App() {
   };
 
   const handleChangeTheme = () => {
+    debugger;
     const newTheme = theme.palette.mode === "dark" ? "light": "dark";
     if (prefersDarkMode ? 'dark' : 'light' === newTheme) {
       localStorage.removeItem(LOCAL_STORAGE_THEME);
@@ -54,6 +80,16 @@ function App() {
       localStorage.setItem(LOCAL_STORAGE_THEME, newTheme);
     }
     setStoredTheme(newTheme);
+  };
+
+  const handleChangeFilterFound = (value) => {
+    localStorage.setItem(LOCAL_STORAGE_FILTER_FOUND, value);
+    setFilterFound(value);
+  };
+
+  const handleChangeHideSecondBatch = (value) => {
+    localStorage.setItem(LOCAL_STORAGE_HIDE_SECOND_BATCH, value);
+    setHideSecondBatch(value);
   };
 
   const theme = useMemo(
@@ -87,22 +123,26 @@ function App() {
   ]);
 
   useEffect(() => {
-    if (searchTerm == null) {
-      setLogs(DATA);
-    } else {
-      setLogs(DATA.filter(({Key, Name}) => (
-        `${Key}. ${Name}`.toLowerCase().includes(searchTerm.toLocaleLowerCase())
-      )));
+    let ret = Object.values(logs);
+    if (hideSecondBatch){
+      ret = ret.filter(({Key}) => Key <= 20);
     }
-  }, [searchTerm]);
+    if (filterFound) {
+      ret = ret.filter(({IsFound}) => !IsFound);
+    }
+    if (searchTerm != null && searchTerm !== '') {
+      ret = ret.filter(({Key, Name}) => (`${Key}. ${Name}`.toLowerCase().includes(searchTerm.toLocaleLowerCase())));
+    }
+    setFilteredLogs(ret);
+  }, [searchTerm, logs, filterFound, hideSecondBatch]);
 
   useEffect(() => {
     switch(sortColumn) {
       case SORT_COLUMN_KEY:
-        setSortedLogs([...logs].sort((a, b) => a.Key > b.Key ? 1 : -1));
+        setSortedLogs([...filteredLogs].sort((a, b) => a.Key > b.Key ? 1 : -1));
         break;
       case SORT_COLUMN_START:
-        setSortedLogs([...logs].sort((a, b) => {
+        setSortedLogs([...filteredLogs].sort((a, b) => {
           if (a.CollectableWindowStartTime === b.CollectableWindowStartTime) return 0;
           if (a.CollectableWindowStartTime == null) return 1;
           if (b.CollectableWindowStartTime == null) return -1;
@@ -110,7 +150,7 @@ function App() {
         }));
         break;
       case SORT_COLUMN_END:
-        setSortedLogs([...logs].sort((a, b) => {
+        setSortedLogs([...filteredLogs].sort((a, b) => {
           if (a.CollectableWindowEndTime === b.CollectableWindowEndTime) return 0;
           if (a.CollectableWindowEndTime == null) return 1;
           if (b.CollectableWindowEndTime == null) return -1;
@@ -120,8 +160,7 @@ function App() {
       default:
         break;
     }
-  }, [sortColumn, logs]);
-
+  }, [sortColumn, filteredLogs]);
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -144,6 +183,10 @@ function App() {
         onChangeSearchTerm={handleChangeSearchTerm}
         sortColumn={sortColumn}
         onChangeSortColumn={handleChangeSortColumn}
+        filterFound={filterFound}
+        onChangeFilterFound={handleChangeFilterFound}
+        filterSecondBatch={hideSecondBatch}
+        onChangeFilterSecondBatch={handleChangeHideSecondBatch}
       />
       <Container component="main">
         <Grid container spacing={2}>
@@ -156,6 +199,7 @@ function App() {
               log={log}
               times={times}
               updateCollectionWindow={updateCollectionWindow}
+              onChangeMarkAsFound={handleChangeMarkAsFound}
             />
           </Grid>
         ))}

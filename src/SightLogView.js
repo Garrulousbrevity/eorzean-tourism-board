@@ -1,6 +1,7 @@
 import { WEATHER_MAPPING, EMOTE_MAPPING } from "./Constants";
-import { Alert, Avatar, Card, CardContent, CardHeader, Chip, Link, Typography } from "@mui/material";
+import { Alert, Avatar, Card, CardContent, CardHeader, Checkbox, Chip, Link, Typography } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
+import { CheckCircle, CheckCircleOutlineOutlined } from "@mui/icons-material";
 
 function SightLogView({
   Key,
@@ -11,11 +12,13 @@ function SightLogView({
   Emote,
   Comment,
   URL,
+  IsFound,
+  onChangeMarkAsFound,
   CollectableWindowStartTime,
   CollectableWindowEndTime,
   WindowStartDisplay,
   WindowEndDisplay,
-  AlertMessage
+  AlertMessage,
 }) {
   return (
     <Card>
@@ -55,18 +58,27 @@ function SightLogView({
               </Grid>
             ))}
           </Grid>
-          {CollectableWindowStartTime == null || CollectableWindowEndTime == null ? (
-          <Typography variant="h4">N/A</Typography> 
-            ) : (
-                <Grid xs={12}>
-                  <Typography variant="h6">Available: {CollectableWindowStartTime.toLocaleTimeString()} - {CollectableWindowEndTime.toLocaleTimeString()}</Typography>
-                </Grid>
-            )}
-            <Grid xs={12}>
-              <Typography paragraph>{Comment}</Typography>
-            </Grid>
+          <Grid xs={12}>
+            {CollectableWindowStartTime == null || CollectableWindowEndTime == null ? (
+                <Typography variant="h4">N/A</Typography> 
+              ) : (
+                <Typography variant="h6">Available: {CollectableWindowStartTime.toLocaleTimeString()} - {CollectableWindowEndTime.toLocaleTimeString()}</Typography>
+              )
+            }
+          </Grid>
+          <Grid xs={12}>
+            <Typography paragraph>{Comment}</Typography>
+          </Grid>
+          <Grid xs={10} />
+          <Grid>
+            <Checkbox
+              icon={<CheckCircleOutlineOutlined />}
+              checkedIcon={<CheckCircle />}
+              checked={IsFound}
+              onChange={({target: {checked}}) => onChangeMarkAsFound({Key, IsFound: checked})}
+            />
+          </Grid>
         </Grid>
-
       </CardContent>
     </Card>
   );
