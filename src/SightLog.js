@@ -29,7 +29,6 @@ const getTimeDisplay = time => {
 
 function SightLog({
   log,
-  times,
   updateCollectionWindow,
   onChangeMarkAsFound
 }) {
@@ -38,7 +37,6 @@ function SightLog({
   const [alert, setAlert] = useState(null);
 
   useEffect(() => {
-    if ((log.CollectableWindowStartTime != null && log.CollectableWindowEndTime != null && log.CollectableWindowEndTime > new Date()) || times.length === 0) return;
     if (log.LastUpdated < Date.now() + EIGHT_HOURS) return;
     const eWeather = new EorzeaWeather(log.ZoneId);
     const phases = PHASES.filter(phase => timesIntersect(phase, log.Window));
@@ -76,7 +74,6 @@ function SightLog({
     log.CollectableWindowStartTime,
     log.CollectableWindowEndTime,
     log.LastUpdated,
-    times,
     updateCollectionWindow
   ]);
 

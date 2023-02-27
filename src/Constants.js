@@ -53,7 +53,6 @@ export const SORT_COLUMNS = [
 export const ONE_HOUR = 175 * 1000;
 export const EIGHT_HOURS = ONE_HOUR * 8;
 export const ONE_DAY = EIGHT_HOURS * 3;
-export const DAYS_TO_CHECK = 10;
 
 export const LOCAL_STORAGE_KEY_SORT_COLUMN = "LocalStorage";
 export const LOCAL_STORAGE_KEY_SEARCH_TERM = "SearchTerm";
