@@ -3,7 +3,7 @@ import EorzeaWeather from 'eorzea-weather';
 export const WEATHER_MAPPING = {
   "Fair Skies": "Fair_Skies.png",
   "Clear Skies": "Clear_Skies.png",
-  "Blizzard": "Blizzard.png",
+  "Blizzards": "Blizzard.png",
   "Clouds": "Clouds.png",
   "Gales": "Gales.png",
   "Heat Waves": "Heat_Waves.png",
@@ -1498,7 +1498,7 @@ export const DATA = {
       "Y": 15.8
     },
     "Weather": [
-      "Blizzard"
+      "Blizzards"
     ],
     "Window": {
       "StartTime": 8,
@@ -1562,7 +1562,7 @@ export const DATA = {
       "Y": 31.3
     },
     "Weather": [
-      "Blizzard"
+      "Blizzards"
     ],
     "Window": {
       "StartTime": 18,
