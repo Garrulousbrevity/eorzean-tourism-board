@@ -1,7 +1,6 @@
 import './App.css';
 import { useState, useEffect, useMemo } from 'react';
-import {DATA, ONE_HOUR, EIGHT_HOURS, ONE_DAY, DAYS_TO_CHECK, SORT_COLUMN_KEY, SORT_COLUMN_START, SORT_COLUMN_END, LOCAL_STORAGE_KEY_SORT_COLUMN, LOCAL_STORAGE_KEY_SEARCH_TERM, LOCAL_STORAGE_THEME, LOCAL_STORAGE_ALREADY_FOUND_LIST, LOCAL_STORAGE_FILTER_FOUND, LOCAL_STORAGE_HIDE_SECOND_BATCH} from './Constants';
-import range from 'lodash/range'
+import {DATA, SORT_COLUMN_KEY, SORT_COLUMN_START, SORT_COLUMN_END, LOCAL_STORAGE_KEY_SORT_COLUMN, LOCAL_STORAGE_KEY_SEARCH_TERM, LOCAL_STORAGE_THEME, LOCAL_STORAGE_ALREADY_FOUND_LIST, LOCAL_STORAGE_FILTER_FOUND, LOCAL_STORAGE_HIDE_SECOND_BATCH} from './Constants';
 import SightLog from './SightLog';
 import { Container } from '@mui/system';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
@@ -16,8 +15,6 @@ import Brightness7Icon from '@mui/icons-material/Brightness7';
 function App() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const [storedTheme, setStoredTheme] = useState(localStorage.getItem(LOCAL_STORAGE_THEME)); 
-  const [times, setTimes] = useState([]);
-  const [lastRefresh, setLastRefresh] = useState(new Date());
   const [logs, setLogs] = useState(Object.values(DATA).reduce((acc, data) => (
     {
       ...acc,
@@ -103,26 +100,6 @@ function App() {
   );
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setLastRefresh(new Date());
-    }, ONE_DAY);
-    return () => clearInterval(interval);
-  })
-
-  useEffect(() => {
-    const msec = new Date().getTime();
-    const bell = (msec / ONE_HOUR) % 24;
-    const startMsec = msec - Math.round(ONE_HOUR * bell);
-    setTimes(range(
-      startMsec,
-      startMsec + ONE_DAY * DAYS_TO_CHECK,
-      EIGHT_HOURS,
-    ));
-  }, [
-    lastRefresh
-  ]);
-
-  useEffect(() => {
     let ret = Object.values(logs);
     if (hideSecondBatch){
       ret = ret.filter(({Key}) => Key <= 20);
@@ -197,7 +174,6 @@ function App() {
           <Grid xs={4} key={log.Key}>
             <SightLog
               log={log}
-              times={times}
               updateCollectionWindow={updateCollectionWindow}
               onChangeMarkAsFound={handleChangeMarkAsFound}
             />
