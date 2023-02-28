@@ -19,10 +19,9 @@ import CssBaseline from '@mui/material/CssBaseline';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Grid from '@mui/material/Unstable_Grid2';
 import Menu from './Menu';
-import { Box, IconButton } from '@mui/material';
-import Brightness4Icon from '@mui/icons-material/Brightness4';
-import Brightness7Icon from '@mui/icons-material/Brightness7';
+import { Box } from '@mui/material';
 import useDeepCompareEffect from 'use-deep-compare-effect';
+import ThemePicker from './ThemePicker';
 
 function App() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -60,19 +59,13 @@ function App() {
   );
 
   const updateCollectionWindow = useCallback(
-    ({
-      Key,
-      CollectableWindowStartTime,
-      CollectableWindowEndTime,
-      LastUpdated,
-    }) => {
+    ({ Key, CollectableWindowStartTime, CollectableWindowEndTime }) => {
       setLogs((prevLogs) => ({
         ...prevLogs,
         [Key]: {
           ...prevLogs[Key],
           CollectableWindowStartTime,
           CollectableWindowEndTime,
-          LastUpdated,
         },
       }));
     },
@@ -90,6 +83,11 @@ function App() {
     localStorage.setItem(`${LOCAL_STORAGE_ALREADY_FOUND_LIST}-${Key}`, IsFound);
   };
 
+  const handleChangeTheme = (newTheme) => {
+    localStorage.setItem(LOCAL_STORAGE_THEME, newTheme);
+    setStoredTheme(newTheme);
+  };
+
   const handleChangeSearchTerm = (searchTerm) => {
     localStorage.setItem(LOCAL_STORAGE_KEY_SEARCH_TERM, searchTerm);
     setSearchTerm(searchTerm);
@@ -98,16 +96,6 @@ function App() {
   const handleChangeSortColumn = (sortColumn) => {
     localStorage.setItem(LOCAL_STORAGE_KEY_SORT_COLUMN, sortColumn);
     setSortColumn(sortColumn);
-  };
-
-  const handleChangeTheme = () => {
-    const newTheme = theme.palette.mode === 'dark' ? 'light' : 'dark';
-    if (prefersDarkMode ? 'dark' : 'light' === newTheme) {
-      localStorage.removeItem(LOCAL_STORAGE_THEME);
-    } else {
-      localStorage.setItem(LOCAL_STORAGE_THEME, newTheme);
-    }
-    setStoredTheme(newTheme);
   };
 
   const handleChangeFilterFound = (value) => {
@@ -128,7 +116,12 @@ function App() {
     () =>
       createTheme({
         palette: {
-          mode: storedTheme ?? (prefersDarkMode ? 'dark' : 'light'),
+          mode:
+            storedTheme === 'dark' || storedTheme === 'light'
+              ? storedTheme
+              : prefersDarkMode
+              ? 'dark'
+              : 'light',
         },
       }),
     [prefersDarkMode, storedTheme]
@@ -200,13 +193,7 @@ function App() {
           color: 'text.primary',
         }}
       >
-        <IconButton sx={{ ml: 1 }} onClick={handleChangeTheme} color="inherit">
-          {theme.palette.mode === 'dark' ? (
-            <Brightness7Icon />
-          ) : (
-            <Brightness4Icon />
-          )}
-        </IconButton>
+        <ThemePicker onChangeTheme={handleChangeTheme} theme={storedTheme} />
       </Box>
       <Menu
         searchTerm={searchTerm}
