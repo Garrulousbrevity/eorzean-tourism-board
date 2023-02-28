@@ -1,8 +1,8 @@
-import EorzeaWeather from "eorzea-weather";
-import EorzeaTime from "eorzea-time";
-import { EIGHT_HOURS, ONE_HOUR, PHASES } from "./Constants";
-import { useState, useEffect } from "react";
-import SightLogView from "./SightLogView";
+import EorzeaWeather from 'eorzea-weather';
+import EorzeaTime from 'eorzea-time';
+import { EIGHT_HOURS, ONE_HOUR, PHASES } from './Constants';
+import { useState, useEffect } from 'react';
+import SightLogView from './SightLogView';
 
 const timesIntersect = (Range1, Range2) => {
   if (Range1.StartTime > Range1.EndTime) {
@@ -27,15 +27,15 @@ const getStartOfDay = () => {
 };
 
 const getTimeDisplay = (time) => {
-  if (time === 0) return "12AM";
-  if (time === 12) return "12PM";
+  if (time === 0) return '12AM';
+  if (time === 12) return '12PM';
   if (time > 11) return `${time % 12}PM`;
   return `${time}AM`;
 };
 
 function SightLog({ log, updateCollectionWindow, onChangeMarkAsFound }) {
-  const [windowStartDisplay, setWindowStartDisplay] = useState("");
-  const [windowEndDisplay, setWindowEndDisplay] = useState("");
+  const [windowStartDisplay, setWindowStartDisplay] = useState('');
+  const [windowEndDisplay, setWindowEndDisplay] = useState('');
   const [alert, setAlert] = useState(null);
 
   useEffect(() => {
@@ -122,7 +122,7 @@ function SightLog({ log, updateCollectionWindow, onChangeMarkAsFound }) {
       log.CollectableWindowStartTime != null &&
         log.CollectableWindowEndTime != null &&
         log.CollectableWindowStartTime >= log.CollectableWindowEndTime
-        ? "This is an impossible time range"
+        ? 'This is an impossible time range'
         : null
     );
   }, [log.CollectableWindowStartTime, log.CollectableWindowEndTime]);

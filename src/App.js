@@ -1,5 +1,5 @@
-import "./App.css";
-import { useState, useCallback, useMemo, useEffect } from "react";
+import './App.css';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import {
   DATA,
   SORT_COLUMN_KEY,
@@ -11,21 +11,21 @@ import {
   LOCAL_STORAGE_ALREADY_FOUND_LIST,
   LOCAL_STORAGE_FILTER_FOUND,
   LOCAL_STORAGE_HIDE_SECOND_BATCH,
-} from "./Constants";
-import SightLog from "./SightLog";
-import { Container } from "@mui/system";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import Grid from "@mui/material/Unstable_Grid2";
-import Menu from "./Menu";
-import { Box, IconButton } from "@mui/material";
-import Brightness4Icon from "@mui/icons-material/Brightness4";
-import Brightness7Icon from "@mui/icons-material/Brightness7";
-import useDeepCompareEffect from 'use-deep-compare-effect'
+} from './Constants';
+import SightLog from './SightLog';
+import { Container } from '@mui/system';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import Grid from '@mui/material/Unstable_Grid2';
+import Menu from './Menu';
+import { Box, IconButton } from '@mui/material';
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
+import useDeepCompareEffect from 'use-deep-compare-effect';
 
 function App() {
-  const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const [storedTheme, setStoredTheme] = useState(
     localStorage.getItem(LOCAL_STORAGE_THEME)
   );
@@ -38,7 +38,7 @@ function App() {
           IsFound:
             localStorage.getItem(
               `${LOCAL_STORAGE_ALREADY_FOUND_LIST}-${data.Key}`
-            ) === "true",
+            ) === 'true',
         },
       }),
       {}
@@ -47,34 +47,37 @@ function App() {
   const [filteredLogs, setFilteredLogs] = useState([]);
   const [sortedLogs, setSortedLogs] = useState([]);
   const [searchTerm, setSearchTerm] = useState(
-    localStorage.getItem(LOCAL_STORAGE_KEY_SEARCH_TERM) ?? ""
+    localStorage.getItem(LOCAL_STORAGE_KEY_SEARCH_TERM) ?? ''
   );
   const [sortColumn, setSortColumn] = useState(
     localStorage.getItem(LOCAL_STORAGE_KEY_SORT_COLUMN) ?? SORT_COLUMN_KEY
   );
   const [filterFound, setFilterFound] = useState(
-    localStorage.getItem(LOCAL_STORAGE_FILTER_FOUND) === "true"
+    localStorage.getItem(LOCAL_STORAGE_FILTER_FOUND) === 'true'
   );
   const [hideSecondBatch, setHideSecondBatch] = useState(
-    localStorage.getItem(LOCAL_STORAGE_HIDE_SECOND_BATCH) === "true"
+    localStorage.getItem(LOCAL_STORAGE_HIDE_SECOND_BATCH) === 'true'
   );
 
-  const updateCollectionWindow = useCallback(({
-    Key,
-    CollectableWindowStartTime,
-    CollectableWindowEndTime,
-    LastUpdated,
-  }) => {
-    setLogs((prevLogs) => ({
-      ...prevLogs,
-      [Key]: {
-        ...prevLogs[Key],
-        CollectableWindowStartTime,
-        CollectableWindowEndTime,
-        LastUpdated,
-      },
-    }));
-  }, []);
+  const updateCollectionWindow = useCallback(
+    ({
+      Key,
+      CollectableWindowStartTime,
+      CollectableWindowEndTime,
+      LastUpdated,
+    }) => {
+      setLogs((prevLogs) => ({
+        ...prevLogs,
+        [Key]: {
+          ...prevLogs[Key],
+          CollectableWindowStartTime,
+          CollectableWindowEndTime,
+          LastUpdated,
+        },
+      }));
+    },
+    []
+  );
 
   const handleChangeMarkAsFound = ({ Key, IsFound }) => {
     setLogs((prevLogs) => ({
@@ -98,8 +101,8 @@ function App() {
   };
 
   const handleChangeTheme = () => {
-    const newTheme = theme.palette.mode === "dark" ? "light" : "dark";
-    if (prefersDarkMode ? "dark" : "light" === newTheme) {
+    const newTheme = theme.palette.mode === 'dark' ? 'light' : 'dark';
+    if (prefersDarkMode ? 'dark' : 'light' === newTheme) {
       localStorage.removeItem(LOCAL_STORAGE_THEME);
     } else {
       localStorage.setItem(LOCAL_STORAGE_THEME, newTheme);
@@ -125,7 +128,7 @@ function App() {
     () =>
       createTheme({
         palette: {
-          mode: storedTheme ?? (prefersDarkMode ? "dark" : "light"),
+          mode: storedTheme ?? (prefersDarkMode ? 'dark' : 'light'),
         },
       }),
     [prefersDarkMode, storedTheme]
@@ -139,7 +142,7 @@ function App() {
     if (filterFound) {
       ret = ret.filter(({ IsFound }) => !IsFound);
     }
-    if (searchTerm != null && searchTerm !== "") {
+    if (searchTerm != null && searchTerm !== '') {
       ret = ret.filter(({ Key, Name }) =>
         `${Key}. ${Name}`.toLowerCase().includes(searchTerm.toLocaleLowerCase())
       );
@@ -189,16 +192,16 @@ function App() {
       <CssBaseline />
       <Box
         sx={{
-          display: "flex",
-          width: "100%",
-          alignItems: "right",
-          justifyContent: "right",
-          bgcolor: "background.default",
-          color: "text.primary",
+          display: 'flex',
+          width: '100%',
+          alignItems: 'right',
+          justifyContent: 'right',
+          bgcolor: 'background.default',
+          color: 'text.primary',
         }}
       >
         <IconButton sx={{ ml: 1 }} onClick={handleChangeTheme} color="inherit">
-          {theme.palette.mode === "dark" ? (
+          {theme.palette.mode === 'dark' ? (
             <Brightness7Icon />
           ) : (
             <Brightness4Icon />
