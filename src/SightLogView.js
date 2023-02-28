@@ -1,4 +1,4 @@
-import { WEATHER_MAPPING, EMOTE_MAPPING } from "./Constants";
+import { WEATHER_MAPPING, EMOTE_MAPPING } from './Constants';
 import {
   Alert,
   Avatar,
@@ -9,9 +9,9 @@ import {
   Chip,
   Link,
   Typography,
-} from "@mui/material";
-import Grid from "@mui/material/Unstable_Grid2/Grid2";
-import { CheckCircle, CheckCircleOutlineOutlined } from "@mui/icons-material";
+} from '@mui/material';
+import Grid from '@mui/material/Unstable_Grid2/Grid2';
+import { CheckCircle, CheckCircleOutlineOutlined } from '@mui/icons-material';
 
 function SightLogView({
   Key,
@@ -83,7 +83,7 @@ function SightLogView({
               <Typography variant="h4">N/A</Typography>
             ) : (
               <Typography variant="h6">
-                Available: {CollectableWindowStartTime.toLocaleTimeString()} -{" "}
+                Available: {CollectableWindowStartTime.toLocaleTimeString()} -{' '}
                 {CollectableWindowEndTime.toLocaleTimeString()}
               </Typography>
             )}

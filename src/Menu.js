@@ -6,8 +6,8 @@ import {
   MenuItem,
   FormControlLabel,
   Checkbox,
-} from "@mui/material";
-import { SORT_COLUMNS } from "./Constants";
+} from '@mui/material';
+import { SORT_COLUMNS } from './Constants';
 
 function Menu({
   searchTerm,
