@@ -1,5 +1,5 @@
 import "./App.css";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import {
   DATA,
   SORT_COLUMN_KEY,
@@ -22,6 +22,7 @@ import Menu from "./Menu";
 import { Box, IconButton } from "@mui/material";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
+import useDeepCompareEffect from 'use-deep-compare-effect'
 
 function App() {
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
@@ -58,7 +59,7 @@ function App() {
     localStorage.getItem(LOCAL_STORAGE_HIDE_SECOND_BATCH) === "true"
   );
 
-  const updateCollectionWindow = ({
+  const updateCollectionWindow = useCallback(({
     Key,
     CollectableWindowStartTime,
     CollectableWindowEndTime,
@@ -73,7 +74,7 @@ function App() {
         LastUpdated,
       },
     }));
-  };
+  }, []);
 
   const handleChangeMarkAsFound = ({ Key, IsFound }) => {
     setLogs((prevLogs) => ({
@@ -116,15 +117,9 @@ function App() {
     setHideSecondBatch(value);
   };
 
-  const numberFound = 1
-  // useMemo(() => {
+  // const numberFound = useMemo(() => {
   //   return Object.values(logs).filter(({isFound}) => isFound).length
   // }, [logs])
-
-  console.log(numberFound)
-  const apiOptionsJsonString = JSON.stringify(filteredLogs);
-  console.log(apiOptionsJsonString)
-
 
   const theme = useMemo(
     () =>
@@ -133,7 +128,7 @@ function App() {
           mode: storedTheme ?? (prefersDarkMode ? "dark" : "light"),
         },
       }),
-    [prefersDarkMode]
+    [prefersDarkMode, storedTheme]
   );
 
   useEffect(() => {
@@ -152,7 +147,7 @@ function App() {
     setFilteredLogs(ret);
   }, [searchTerm, logs, filterFound, hideSecondBatch]);
 
-  useEffect(() => {
+  useDeepCompareEffect(() => {
     switch (sortColumn) {
       case SORT_COLUMN_KEY:
         setSortedLogs(
@@ -188,7 +183,7 @@ function App() {
       default:
         break;
     }
-  }, [sortColumn, apiOptionsJsonString]);
+  }, [sortColumn, filteredLogs]);
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
