@@ -1,3 +1,4 @@
+import React from 'react';
 import { WEATHER_MAPPING, EMOTE_MAPPING } from './Constants';
 import {
   Alert,
