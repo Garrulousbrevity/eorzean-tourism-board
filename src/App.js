@@ -1,5 +1,5 @@
 import './App.css';
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { React, useState, useCallback, useMemo, useEffect } from 'react';
 import {
   DATA,
   SORT_COLUMN_KEY,
@@ -57,6 +57,7 @@ function App() {
   const [hideSecondBatch, setHideSecondBatch] = useState(
     localStorage.getItem(LOCAL_STORAGE_HIDE_SECOND_BATCH) === 'true'
   );
+  const [currentTime, setCurrentTime] = useState(Date.now());
 
   const updateCollectionWindow = useCallback(
     ({ Key, CollectableWindowStartTime, CollectableWindowEndTime }) => {
@@ -180,6 +181,16 @@ function App() {
         break;
     }
   }, [sortColumn, filteredLogs]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 60000);
+    return () => {
+      clearInterval(interval);
+    };
+  });
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -220,6 +231,8 @@ function App() {
                 log={log}
                 updateCollectionWindow={updateCollectionWindow}
                 onChangeMarkAsFound={handleChangeMarkAsFound}
+                // currentTime={1677623675000}
+                currentTime={currentTime}
               />
             </Grid>
           ))}

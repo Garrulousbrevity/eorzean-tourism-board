@@ -1,8 +1,10 @@
+import React from 'react';
 import EorzeaWeather from 'eorzea-weather';
 import EorzeaTime from 'eorzea-time';
 import { EIGHT_HOURS, ONE_HOUR, PHASES } from './Constants';
 import { useState, useEffect } from 'react';
 import SightLogView from './SightLogView';
+import useDeepCompareEffect from 'use-deep-compare-effect';
 
 const timesIntersect = (Range1, Range2) => {
   if (Range1.StartTime > Range1.EndTime) {
@@ -20,8 +22,8 @@ const timesIntersect = (Range1, Range2) => {
   return Range1.StartTime < Range2.EndTime && Range1.EndTime > Range2.StartTime;
 };
 
-const getStartOfDay = () => {
-  const msec = new Date().getTime();
+const getStartOfDay = (date) => {
+  const msec = date.getTime();
   const bell = (msec / ONE_HOUR) % 24;
   return msec - Math.round(ONE_HOUR * bell);
 };
@@ -33,84 +35,83 @@ const getTimeDisplay = (time) => {
   return `${time}AM`;
 };
 
-function SightLog({ log, updateCollectionWindow, onChangeMarkAsFound }) {
+const getWindow = ({ log, currentTime }) => {
+  const eWeather = new EorzeaWeather(log.ZoneId);
+  const phases = PHASES.filter((phase) => timesIntersect(phase, log.Window));
+  let goodWeatherFound = false;
+  let startOfWeatherWindow = 0;
+  while (!goodWeatherFound) {
+    if (startOfWeatherWindow === 0) {
+      startOfWeatherWindow = getStartOfDay(
+        new Date(currentTime)
+      );
+    } else {
+      startOfWeatherWindow += EIGHT_HOURS;
+    }
+    const startOfWeatherWindowDate = new Date(startOfWeatherWindow);
+    const phase = phases.find(
+      (phase) =>
+        phase.StartTime === new EorzeaTime(startOfWeatherWindowDate).getHours()
+    );
+    if (phase == null) continue;
+    if (
+      !log.Weather.some(
+        (allowedWeather) =>
+          allowedWeather === eWeather.getWeather(startOfWeatherWindowDate)
+      )
+    )
+      continue;
+    const effectiveWindowStartTime = Math.max(
+      phase.EndTime < log.Window.StartTime // This is checking for whether the log crosses midnight into the next day
+        ? phase.StartTime
+        : log.Window.StartTime,
+      phase.StartTime
+    );
+    const baseOffset = effectiveWindowStartTime - phase.StartTime;
+    const CollectableWindowStartTime = new Date(
+      startOfWeatherWindow + ONE_HOUR * baseOffset
+    );
+    const nextWindowStart = (startOfWeatherWindow += EIGHT_HOURS);
+    const nextWindowIsAlsoGoodWeather = log.Weather.some(
+      (weather) => weather === eWeather.getWeather(new Date(nextWindowStart))
+    );
+    let effectiveWindowEndTime =
+      log.Window.EndTime > log.Window.StartTime
+        ? log.Window.EndTime
+        : log.Window.EndTime + 24;
+    if (
+      effectiveWindowEndTime >= phase.EndTime &&
+      !nextWindowIsAlsoGoodWeather
+    ) {
+      effectiveWindowEndTime = phase.EndTime;
+    }
+    const CollectableWindowEndTime = new Date(
+      startOfWeatherWindow +
+        (baseOffset + effectiveWindowEndTime - effectiveWindowStartTime) *
+          ONE_HOUR
+    );
+    if (Date(currentTime) > CollectableWindowEndTime) continue;
+    return {
+      Key: log.Key,
+      CollectableWindowStartTime,
+      CollectableWindowEndTime,
+    };
+  }
+};
+
+function SightLog({
+  log,
+  updateCollectionWindow,
+  onChangeMarkAsFound,
+  currentTime,
+}) {
   const [windowStartDisplay, setWindowStartDisplay] = useState('');
   const [windowEndDisplay, setWindowEndDisplay] = useState('');
   const [alert, setAlert] = useState(null);
 
-  useEffect(() => {
-    if (log.LastUpdated < Date.now() + EIGHT_HOURS) return;
-    const eWeather = new EorzeaWeather(log.ZoneId);
-    const phases = PHASES.filter((phase) => timesIntersect(phase, log.Window));
-    let goodWeatherFound = false;
-    let startOfWeatherWindow = 0;
-    while (!goodWeatherFound) {
-      if (startOfWeatherWindow === 0) {
-        startOfWeatherWindow = getStartOfDay();
-      } else {
-        startOfWeatherWindow += EIGHT_HOURS;
-      }
-      const startOfWeatherWindowDate = new Date(startOfWeatherWindow);
-      const phase = phases.find(
-        (phase) =>
-          phase.StartTime ===
-          new EorzeaTime(startOfWeatherWindowDate).getHours()
-      );
-      if (phase == null) continue;
-      if (
-        !log.Weather.some(
-          (allowedWeather) =>
-            allowedWeather === eWeather.getWeather(startOfWeatherWindowDate)
-        )
-      )
-        continue;
-      const effectiveWindowStartTime = Math.max(
-        phase.EndTime < log.Window.StartTime
-          ? phase.StartTime
-          : log.Window.StartTime,
-        phase.StartTime
-      );
-      const baseOffset = effectiveWindowStartTime - phase.StartTime;
-      const CollectableWindowStartTime = new Date(
-        startOfWeatherWindow + ONE_HOUR * baseOffset
-      );
-      const nextWindowStart = (startOfWeatherWindow += EIGHT_HOURS);
-      const nextWindowIsAlsoGoodWeather = log.Weather.some(
-        (weather) => weather === eWeather.getWeather(new Date(nextWindowStart))
-      );
-      let effectiveWindowEndTime =
-        log.Window.EndTime > log.Window.StartTime
-          ? log.Window.EndTime
-          : log.Window.EndTime + 24;
-      if (
-        effectiveWindowEndTime >= phase.EndTime &&
-        !nextWindowIsAlsoGoodWeather
-      ) {
-        effectiveWindowEndTime = phase.EndTime;
-      }
-      const CollectableWindowEndTime = new Date(
-        startOfWeatherWindow +
-          (baseOffset + effectiveWindowEndTime - effectiveWindowStartTime) *
-            ONE_HOUR
-      );
-      if (Date.now() > CollectableWindowEndTime) continue;
-      updateCollectionWindow({
-        Key: log.Key,
-        CollectableWindowStartTime,
-        CollectableWindowEndTime,
-      });
-      goodWeatherFound = true;
-    }
-  }, [
-    log.Key,
-    log.Weather,
-    log.Window,
-    log.ZoneId,
-    log.CollectableWindowStartTime,
-    log.CollectableWindowEndTime,
-    log.LastUpdated,
-    updateCollectionWindow,
-  ]);
+  useDeepCompareEffect(() => {
+    if (currentTime != null) updateCollectionWindow(getWindow({ log, currentTime }));
+  }, [log, updateCollectionWindow, currentTime]);
 
   useEffect(() => {
     setWindowStartDisplay(getTimeDisplay(log.Window.StartTime));
