@@ -42,9 +42,7 @@ const getWindow = ({ log, currentTime }) => {
   let startOfWeatherWindow = 0;
   while (!goodWeatherFound) {
     if (startOfWeatherWindow === 0) {
-      startOfWeatherWindow = getStartOfDay(
-        new Date(currentTime)
-      );
+      startOfWeatherWindow = getStartOfDay(new Date(currentTime));
     } else {
       startOfWeatherWindow += EIGHT_HOURS;
     }
@@ -90,7 +88,6 @@ const getWindow = ({ log, currentTime }) => {
         (baseOffset + effectiveWindowEndTime - effectiveWindowStartTime) *
           ONE_HOUR
     );
-    debugger;
     if (new Date(currentTime) > CollectableWindowEndTime) continue;
     return {
       Key: log.Key,
@@ -111,7 +108,8 @@ function SightLog({
   const [alert, setAlert] = useState(null);
 
   useDeepCompareEffect(() => {
-    if (currentTime != null) updateCollectionWindow(getWindow({ log, currentTime }));
+    if (currentTime != null)
+      updateCollectionWindow(getWindow({ log, currentTime }));
   }, [log, updateCollectionWindow, currentTime]);
 
   useEffect(() => {
