@@ -78,15 +78,14 @@ const getWindow = ({ log, currentTime }) => {
         ? log.Window.EndTime
         : log.Window.EndTime + 24;
     if (
-      effectiveWindowEndTime >= phase.EndTime &&
+      effectiveWindowEndTime >= phase.EndTime + 1 &&
       !nextWindowIsAlsoGoodWeather
     ) {
-      effectiveWindowEndTime = phase.EndTime;
+      effectiveWindowEndTime = phase.EndTime + 1;
     }
     const CollectableWindowEndTime = new Date(
-      startOfWeatherWindow +
-        (baseOffset + effectiveWindowEndTime - effectiveWindowStartTime) *
-          ONE_HOUR
+      CollectableWindowStartTime.getTime() +
+        (effectiveWindowEndTime - effectiveWindowStartTime) * ONE_HOUR
     );
     if (new Date(currentTime) > CollectableWindowEndTime) continue;
     return {
@@ -108,7 +107,12 @@ function SightLog({
   const [alert, setAlert] = useState(null);
 
   useDeepCompareEffect(() => {
-    if (currentTime != null)
+    if (
+      currentTime != null ||
+      log.CollectableWindowStartTime != null ||
+      log.CollectableWindowEndTime != null ||
+      currentTime > log.CollectableWindowEndTime
+    )
       updateCollectionWindow(getWindow({ log, currentTime }));
   }, [log, updateCollectionWindow, currentTime]);
 
