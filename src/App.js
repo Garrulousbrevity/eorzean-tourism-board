@@ -231,7 +231,6 @@ function App() {
                 log={log}
                 updateCollectionWindow={updateCollectionWindow}
                 onChangeMarkAsFound={handleChangeMarkAsFound}
-                // currentTime={1677623675000}
                 currentTime={currentTime}
               />
             </Grid>
