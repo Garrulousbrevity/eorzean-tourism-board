@@ -90,7 +90,8 @@ const getWindow = ({ log, currentTime }) => {
         (baseOffset + effectiveWindowEndTime - effectiveWindowStartTime) *
           ONE_HOUR
     );
-    if (Date(currentTime) > CollectableWindowEndTime) continue;
+    debugger;
+    if (new Date(currentTime) > CollectableWindowEndTime) continue;
     return {
       Key: log.Key,
       CollectableWindowStartTime,
