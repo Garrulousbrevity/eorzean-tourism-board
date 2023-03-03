@@ -18,7 +18,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Grid from '@mui/material/Unstable_Grid2';
-import Menu from './Menu';
+import EtbDrawer from './EtbDrawer';
 import { Box } from '@mui/material';
 import useDeepCompareEffect from 'use-deep-compare-effect';
 import ThemePicker from './ThemePicker';
@@ -185,7 +185,7 @@ function App() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(Date.now());
-    }, 60000);
+    }, 10000);
     return () => {
       clearInterval(interval);
     };
@@ -198,15 +198,23 @@ function App() {
         sx={{
           display: 'flex',
           width: '100%',
-          alignItems: 'right',
-          justifyContent: 'right',
-          bgcolor: 'background.default',
-          color: 'text.primary',
+          alignItems: 'left',
+          justifyContent: 'left',
         }}
       >
         <ThemePicker onChangeTheme={handleChangeTheme} theme={storedTheme} />
       </Box>
-      <Menu
+      <Box
+        sx={{
+          display: 'flex',
+          width: '100%',
+          alignItems: 'right',
+          justifyContent: 'right',
+        }}
+      >
+        <ThemePicker onChangeTheme={handleChangeTheme} theme={storedTheme} />
+      </Box>
+      <EtbDrawer
         searchTerm={searchTerm}
         onChangeSearchTerm={handleChangeSearchTerm}
         sortColumn={sortColumn}
@@ -226,7 +234,7 @@ function App() {
             />
           </Grid>
           {sortedLogs.map((log) => (
-            <Grid xs={4} key={log.Key}>
+            <Grid xs={12} sm={6} md={4} key={log.Key}>
               <SightLog
                 log={log}
                 updateCollectionWindow={updateCollectionWindow}
