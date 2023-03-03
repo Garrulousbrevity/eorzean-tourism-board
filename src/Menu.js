@@ -21,6 +21,7 @@ function Menu({
   onChangeFilterSecondBatch,
 }) {
   return (
+<<<<<<< Updated upstream
     <Drawer variant="permanent" anchor="left">
       <Toolbar />
       <Divider />
@@ -65,6 +66,25 @@ function Menu({
         }
       />
     </Drawer>
+=======
+    <AppBar>
+      <Toolbar>
+        <Box display="flex" flexGrow={1}>
+          <IconButton
+            size="large"
+            edge="start"
+            color="inherit"
+            aria-label="menu"
+            sx={{ mr: 2 }}
+            onClick={onMenuButtonClick}
+          >
+            <MenuIcon />
+          </IconButton>
+        </Box>
+        <ThemePicker theme={theme} onChangeTheme={onChangeTheme} />
+      </Toolbar>
+    </AppBar>
+>>>>>>> Stashed changes
   );
 }
 

@@ -216,7 +216,7 @@ function App() {
         filterSecondBatch={hideSecondBatch}
         onChangeFilterSecondBatch={handleChangeHideSecondBatch}
       />
-      <Container component="main">
+      <Container component="main" sx={{ mt: 10 }} >
         <Grid container spacing={2}>
           <Grid xs={12}>
             <img
