@@ -18,10 +18,9 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Grid from '@mui/material/Unstable_Grid2';
+import EtbDrawer from './EtbDrawer';
 import Menu from './Menu';
-import { Box } from '@mui/material';
 import useDeepCompareEffect from 'use-deep-compare-effect';
-import ThemePicker from './ThemePicker';
 
 function App() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -58,6 +57,7 @@ function App() {
     localStorage.getItem(LOCAL_STORAGE_HIDE_SECOND_BATCH) === 'true'
   );
   const [currentTime, setCurrentTime] = useState(Date.now());
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const updateCollectionWindow = useCallback(
     ({ Key, CollectableWindowStartTime, CollectableWindowEndTime }) => {
@@ -117,6 +117,9 @@ function App() {
     () =>
       createTheme({
         palette: {
+          secondary: {
+            main: '#00ff99',
+          },
           mode:
             storedTheme === 'dark' || storedTheme === 'light'
               ? storedTheme
@@ -185,7 +188,7 @@ function App() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(Date.now());
-    }, 60000);
+    }, 10000);
     return () => {
       clearInterval(interval);
     };
@@ -194,19 +197,12 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Box
-        sx={{
-          display: 'flex',
-          width: '100%',
-          alignItems: 'right',
-          justifyContent: 'right',
-          bgcolor: 'background.default',
-          color: 'text.primary',
-        }}
-      >
-        <ThemePicker onChangeTheme={handleChangeTheme} theme={storedTheme} />
-      </Box>
       <Menu
+        theme={storedTheme}
+        onChangeTheme={handleChangeTheme}
+        onMenuButtonClick={() => setDrawerOpen((prev) => !prev)}
+      />
+      <EtbDrawer
         searchTerm={searchTerm}
         onChangeSearchTerm={handleChangeSearchTerm}
         sortColumn={sortColumn}
@@ -215,6 +211,8 @@ function App() {
         onChangeFilterFound={handleChangeFilterFound}
         filterSecondBatch={hideSecondBatch}
         onChangeFilterSecondBatch={handleChangeHideSecondBatch}
+        open={drawerOpen}
+        onClose={() => setDrawerOpen((prev) => !prev)}
       />
       <Container component="main">
         <Grid container spacing={2}>
@@ -226,7 +224,7 @@ function App() {
             />
           </Grid>
           {sortedLogs.map((log) => (
-            <Grid xs={4} key={log.Key}>
+            <Grid xs={12} sm={6} md={4} key={log.Key}>
               <SightLog
                 log={log}
                 updateCollectionWindow={updateCollectionWindow}
