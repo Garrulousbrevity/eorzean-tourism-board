@@ -5,7 +5,7 @@ import ThemePicker from './ThemePicker';
 
 function Menu({ theme, onChangeTheme, onMenuButtonClick }) {
   return (
-    <AppBar position="fixed">
+    <AppBar>
       <Toolbar>
         <Box display="flex" flexGrow={1}>
           <IconButton
