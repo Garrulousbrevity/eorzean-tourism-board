@@ -26,15 +26,15 @@ function Menu({
   onClose,
 }) {
   const theme = useTheme();
-  const isXlUp = useMediaQuery(theme.breakpoints.up("xl"));
+  const isXlUp = useMediaQuery(theme.breakpoints.up('xl'));
 
   return (
     <Drawer
-    variant={ isXlUp ? "permanent" : "temporary"}
-    anchor="left"
-    open={open}
-    onClose={onClose}
-  >
+      variant={isXlUp ? 'permanent' : 'temporary'}
+      anchor="left"
+      open={open}
+      onClose={onClose}
+    >
       <Toolbar />
       <Divider />
       <TextField

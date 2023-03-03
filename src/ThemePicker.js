@@ -10,15 +10,20 @@ function ThemePicker({ theme, onChangeTheme }) {
       value={theme}
       onChange={({ target: { value } }) => onChangeTheme(value)}
       row
+      color="inherit"
     >
       <Radio
-        checkedIcon={<Brightness7Icon />}
+        checkedIcon={<Brightness7Icon color="secondary" />}
         icon={<Brightness7Icon />}
         value="light"
       />
-      <Radio checkedIcon={<Computer />} icon={<Computer />} value="system" />
       <Radio
-        checkedIcon={<Brightness4Icon />}
+        checkedIcon={<Computer color="secondary" />}
+        icon={<Computer />}
+        value="system"
+      />
+      <Radio
+        checkedIcon={<Brightness4Icon color="secondary" />}
         icon={<Brightness4Icon />}
         value="dark"
       />

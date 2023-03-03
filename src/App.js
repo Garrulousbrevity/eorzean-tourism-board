@@ -19,9 +19,8 @@ import CssBaseline from '@mui/material/CssBaseline';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Grid from '@mui/material/Unstable_Grid2';
 import EtbDrawer from './EtbDrawer';
-import { Box } from '@mui/material';
+import Menu from './Menu';
 import useDeepCompareEffect from 'use-deep-compare-effect';
-import ThemePicker from './ThemePicker';
 
 function App() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -58,6 +57,7 @@ function App() {
     localStorage.getItem(LOCAL_STORAGE_HIDE_SECOND_BATCH) === 'true'
   );
   const [currentTime, setCurrentTime] = useState(Date.now());
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const updateCollectionWindow = useCallback(
     ({ Key, CollectableWindowStartTime, CollectableWindowEndTime }) => {
@@ -117,6 +117,9 @@ function App() {
     () =>
       createTheme({
         palette: {
+          secondary: {
+            main: '#00ff99',
+          },
           mode:
             storedTheme === 'dark' || storedTheme === 'light'
               ? storedTheme
@@ -194,26 +197,11 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Box
-        sx={{
-          display: 'flex',
-          width: '100%',
-          alignItems: 'left',
-          justifyContent: 'left',
-        }}
-      >
-        <ThemePicker onChangeTheme={handleChangeTheme} theme={storedTheme} />
-      </Box>
-      <Box
-        sx={{
-          display: 'flex',
-          width: '100%',
-          alignItems: 'right',
-          justifyContent: 'right',
-        }}
-      >
-        <ThemePicker onChangeTheme={handleChangeTheme} theme={storedTheme} />
-      </Box>
+      <Menu
+        theme={storedTheme}
+        onChangeTheme={handleChangeTheme}
+        onMenuButtonClick={() => setDrawerOpen((prev) => !prev)}
+      />
       <EtbDrawer
         searchTerm={searchTerm}
         onChangeSearchTerm={handleChangeSearchTerm}
@@ -223,6 +211,8 @@ function App() {
         onChangeFilterFound={handleChangeFilterFound}
         filterSecondBatch={hideSecondBatch}
         onChangeFilterSecondBatch={handleChangeHideSecondBatch}
+        open={drawerOpen}
+        onClose={() => setDrawerOpen((prev) => !prev)}
       />
       <Container component="main">
         <Grid container spacing={2}>
