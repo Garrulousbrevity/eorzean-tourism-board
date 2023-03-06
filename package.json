@@ -14,6 +14,7 @@
     "eorzea-time": "^3.0.0",
     "eorzea-weather": "^3.2.0",
     "gh-pages": "^5.0.0",
+    "jest-config": "^29.4.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
@@ -22,7 +23,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "test": "react-scripts test",
+    "test": "jest",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
